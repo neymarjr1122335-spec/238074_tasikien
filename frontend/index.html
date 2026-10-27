@@ -109,10 +109,8 @@
     </div>
 
     <script>
-        // Cấu hình API URL (Tự động nhận diện môi trường local hoặc cloud)
-        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-            ? 'http://localhost:5000/api/employees' 
-            : '/api/employees'; // Hoặc link API trên Render
+        // Cố định đường dẫn API trực tiếp trỏ tới Backend trên Render
+        const API_URL = 'https://api-238074.onrender.com/api/employees';
 
         function showAlert(message, type = 'success') {
             const box = document.getElementById('alertBox');
@@ -192,7 +190,7 @@
                 }
 
                 const result = await res.json();
-                if (!res.ok) throw new Error(result.error || 'Thao tác thất bại');
+                if (!res.ok) throw new Error(result.error || result.message || 'Thao tác thất bại');
 
                 showAlert(dbId ? 'Cập nhật nhân viên thành công!' : 'Thêm nhân viên thành công!');
                 resetForm();
@@ -233,7 +231,7 @@
             try {
                 const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
                 const result = await res.json();
-                if (!res.ok) throw new Error(result.error || 'Xóa thất bại');
+                if (!res.ok) throw new Error(result.error || result.message || 'Xóa thất bại');
                 
                 showAlert('Xóa nhân viên thành công!');
                 fetchEmployees();
