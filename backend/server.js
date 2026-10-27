@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(cors());
 
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://admin:admin@cluster.mongodb.net/238074_tasikien?retryWrites=true&w=majority';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://neymarjr1122335_db_user:kien2005@cluster0.jmzugbu.mongodb.net/238074_tasikien?retryWrites=true&w=majority';
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log('MongoDB Connected Successfully to 238074_tasikien'))
