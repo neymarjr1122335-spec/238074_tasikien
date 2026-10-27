@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Hệ thống Quản lý Nhân sự - 238074</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+        h2 { color: #333; }
+        form { background: #fff; padding: 15px; border-radius: 5px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 10px; flex-wrap: wrap; }
+        input { padding: 8px; flex: 1; min-width: 150px; }
+        button { padding: 8px 15px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 3px; }
+        button:hover { background: #0056b3; }
+        table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #007bff; color: white; }
+        .delete-btn { background: #dc3545; }
+        .delete-btn:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+
+    <h2>HỆ THỐNG QUẢN LÝ NHÂN SỰ (MSSV: 238074 - tasikien)</h2>
+
+    <form id="empForm">
+        <input type="hidden" id="empId">
+        <input type="text" id="name" placeholder="Họ tên" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="text" id="position" placeholder="Chức vụ" required>
+        <input type="text" id="department" placeholder="Phòng ban" required>
+        <input type="number" id="salary" placeholder="Lương" required>
+        <button type="submit" id="submitBtn">Thêm nhân viên</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Chức vụ</th>
+                <th>Phòng ban</th>
+                <th>Lương</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody id="empTableBody">
+            <!-- Dữ liệu hiển thị ở đây -->
+        </tbody>
+    </table>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api/employees';
+
+        async function fetchEmployees() {
+            try {
+                const res = await fetch(API_URL);
+                const employees = await res.json();
+                const tbody = document.getElementById('empTableBody');
+                tbody.innerHTML = '';
+                employees.forEach(emp => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${emp.name}</td>
+                            <td>${emp.email}</td>
+                            <td>${emp.position}</td>
+                            <td>${emp.department}</td>
+                            <td>${emp.salary}</td>
+                            <td>
+                                <button onclick="editEmployee('${emp._id}', '${emp.name}', '${emp.email}', '${emp.position}', '${emp.department}', ${emp.salary})">Sửa</button>
+                                <button class="delete-btn" onclick="deleteEmployee('${emp._id}')">Xóa</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error("Lỗi tải dữ liệu:", err);
+            }
+        }
+
+        document.getElementById('empForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('empId').value;
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                position: document.getElementById('position').value,
+                department: document.getElementById('department').value,
+                salary: Number(document.getElementById('salary').value)
+            };
+
+            if (id) {
+                await fetch(`${API_URL}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            } else {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            }
+
+            resetForm();
+            fetchEmployees();
+        });
+
+        function editEmployee(id, name, email, position, department, salary) {
+            document.getElementById('empId').value = id;
+            document.getElementById('name').value = name;
+            document.getElementById('email').value = email;
+            document.getElementById('position').value = position;
+            document.getElementById('department').value = department;
+            document.getElementById('salary').value = salary;
+            document.getElementById('submitBtn').innerText = 'Cập nhật';
+        }
+
+        async function deleteEmployee(id) {
+            if (confirm('Bạn có chắc muốn xóa nhân viên này?')) {
+                await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                fetchEmployees();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('empForm').reset();
+            document.getElementById('empId').value = '';
+            document.getElementById('submitBtn').innerText = 'Thêm nhân viên';
+        }
+
+        fetchEmployees();
+    </script>
+</body>
+</html>
