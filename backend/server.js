@@ -11,11 +11,12 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://admin:admin@cluster.mongodb.net/238074_tasikien?retryWrites=true&w=majority';
 
 mongoose.connect(MONGO_URI)
-    .then(() => console.log('MongoDB Connected Successfully'))
+    .then(() => console.log('MongoDB Connected Successfully to 238074_tasikien'))
     .catch((err) => console.log('Database connection error: ', err));
 
 const Employee = require('./models/Employee');
 
+// Lấy danh sách nhân viên
 app.get('/api/employees', async (req, res) => {
     try {
         const employees = await Employee.find();
@@ -25,6 +26,7 @@ app.get('/api/employees', async (req, res) => {
     }
 });
 
+// Thêm nhân viên mới
 app.post('/api/employees', async (req, res) => {
     try {
         const newEmployee = new Employee(req.body);
@@ -35,6 +37,7 @@ app.post('/api/employees', async (req, res) => {
     }
 });
 
+// Cập nhật nhân viên
 app.put('/api/employees/:id', async (req, res) => {
     try {
         const updatedEmployee = await Employee.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -44,6 +47,7 @@ app.put('/api/employees/:id', async (req, res) => {
     }
 });
 
+// Xóa nhân viên
 app.delete('/api/employees/:id', async (req, res) => {
     try {
         await Employee.findByIdAndDelete(req.params.id);
